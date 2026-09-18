@@ -27,7 +27,6 @@ const ClientOverview = ({ onOpenRequestModal }) => {
   useEffect(() => {
     const fetchServices = async () => {
       setLoading(true);
-
       try {
         const res = await api.get('/services/my-services');
         if (res.data.success) {
