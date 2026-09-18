@@ -25,7 +25,6 @@ const ClientOverview = ({ onOpenRequestModal }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-
     const fetchServices = async () => {
       setLoading(true);
       try {
