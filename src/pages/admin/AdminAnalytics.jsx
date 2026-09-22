@@ -137,6 +137,26 @@ export const AdminAnalytics = () => {
               </div>
             </div>
 
+            {/* In Progress Services */}
+            <div className="data-card" style={{ padding: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                <div style={{ padding: '10px', borderRadius: '10px', background: '#eff6ff', color: '#2563eb' }}>
+                  <Wrench size={20} />
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>
+                    In Progress
+                  </div>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#2563eb' }}>
+                    {stats.inProgressServices || 0}
+                  </div>
+                </div>
+              </div>
+              <div style={{ fontSize: '0.78rem', color: '#2563eb', fontWeight: 600 }}>
+                Active operations underway
+              </div>
+            </div>
+
             {/* Completed Services */}
             <div className="data-card" style={{ padding: '20px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>

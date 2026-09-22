@@ -13,7 +13,12 @@ import {
   CheckCircle2,
   XCircle,
   Loader2,
-  FileQuestion
+  FileQuestion,
+  Lock,
+  KeyRound,
+  Eye,
+  EyeOff,
+  ShieldCheck
 } from 'lucide-react';
 import api from '../services/api';
 import { ServiceStatusControl } from './ServiceStatusControl';
@@ -30,6 +35,16 @@ export const ClientDetailsDrawer = ({ client, onClose, onClientUpdated }) => {
   const [saving, setSaving] = useState(false);
   const [feedback, setFeedback] = useState({ type: '', message: '' });
 
+  // Password state for settings tab
+  const [passwordData, setPasswordData] = useState({
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [passwordSaving, setPasswordSaving] = useState(false);
+  const [passwordFeedback, setPasswordFeedback] = useState({ type: '', message: '' });
+
   // Services tab state
   const [clientServices, setClientServices] = useState([]);
   const [servicesLoading, setServicesLoading] = useState(false);
@@ -45,6 +60,8 @@ export const ClientDetailsDrawer = ({ client, onClose, onClientUpdated }) => {
         status: client.status || 'active'
       });
       setFeedback({ type: '', message: '' });
+      setPasswordFeedback({ type: '', message: '' });
+      setPasswordData({ newPassword: '', confirmPassword: '' });
       // Reset services whenever client changes
       setClientServices([]);
       setServicesFetched(false);
@@ -94,13 +111,36 @@ export const ClientDetailsDrawer = ({ client, onClose, onClientUpdated }) => {
       return;
     }
 
+    // If new password is provided, validate it
+    if (passwordData.newPassword) {
+      if (passwordData.newPassword.trim().length < 6) {
+        setFeedback({ type: 'error', message: 'New password must be at least 6 characters long.' });
+        return;
+      }
+      if (passwordData.newPassword !== passwordData.confirmPassword) {
+        setFeedback({ type: 'error', message: 'New password and confirmation do not match.' });
+        return;
+      }
+    }
+
     setSaving(true);
     setFeedback({ type: '', message: '' });
 
     try {
-      const res = await api.put(`/clients/${client._id}`, formData);
+      const payload = { ...formData };
+      if (passwordData.newPassword) {
+        payload.password = passwordData.newPassword.trim();
+      }
+
+      const res = await api.put(`/clients/${client._id}`, payload);
       if (res.data.success) {
-        setFeedback({ type: 'success', message: 'Client details updated successfully!' });
+        setFeedback({
+          type: 'success',
+          message: passwordData.newPassword
+            ? 'Client details and password updated successfully!'
+            : 'Client details updated successfully!'
+        });
+        setPasswordData({ newPassword: '', confirmPassword: '' });
         if (onClientUpdated) {
           onClientUpdated(res.data.data);
         }
@@ -115,6 +155,43 @@ export const ClientDetailsDrawer = ({ client, onClose, onClientUpdated }) => {
       });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handlePasswordOnlyUpdate = async (e) => {
+    e.preventDefault();
+    if (!passwordData.newPassword) {
+      setPasswordFeedback({ type: 'error', message: 'Please enter a new password.' });
+      return;
+    }
+    if (passwordData.newPassword.trim().length < 6) {
+      setPasswordFeedback({ type: 'error', message: 'Password must be at least 6 characters.' });
+      return;
+    }
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setPasswordFeedback({ type: 'error', message: 'Passwords do not match.' });
+      return;
+    }
+
+    setPasswordSaving(true);
+    setPasswordFeedback({ type: '', message: '' });
+
+    try {
+      const res = await api.put(`/clients/${client._id}`, {
+        password: passwordData.newPassword.trim()
+      });
+      if (res.data.success) {
+        setPasswordFeedback({ type: 'success', message: 'Password successfully updated for this client!' });
+        setPasswordData({ newPassword: '', confirmPassword: '' });
+        setTimeout(() => setPasswordFeedback({ type: '', message: '' }), 4000);
+      }
+    } catch (err) {
+      setPasswordFeedback({
+        type: 'error',
+        message: err.response?.data?.message || 'Failed to update password.'
+      });
+    } finally {
+      setPasswordSaving(false);
     }
   };
 
@@ -400,7 +477,7 @@ export const ClientDetailsDrawer = ({ client, onClose, onClientUpdated }) => {
             <div>
               <div className="form-section-title">Account Security</div>
               <div className="form-group">
-                <label className="form-label">Status</label>
+                <label className="form-label">Account Status</label>
                 <select
                   name="status"
                   value={formData.status}
@@ -413,9 +490,138 @@ export const ClientDetailsDrawer = ({ client, onClose, onClientUpdated }) => {
                   <option value="pending">Pending</option>
                 </select>
               </div>
-              <p style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '12px' }}>
+              <p style={{ fontSize: '0.78rem', color: '#64748b', marginTop: '6px', marginBottom: '22px' }}>
                 Deactivating this client will prevent them from signing in to the client portal.
               </p>
+
+              {/* CHANGE PASSWORD SETTINGS OPTION */}
+              <div className="form-section-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <KeyRound size={15} style={{ color: '#2563eb' }} />
+                <span>Change Password</span>
+              </div>
+
+              <div
+                style={{
+                  background: '#f8fafc',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '10px',
+                  padding: '16px',
+                  marginTop: '10px'
+                }}
+              >
+                <div style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '14px' }}>
+                  Assign a new password for this client to sign into their portal account.
+                </div>
+
+                {passwordFeedback.message && (
+                  <div
+                    className={`alert-banner ${passwordFeedback.type === 'error' ? 'alert-danger' : 'alert-success'}`}
+                    style={{ marginBottom: '14px' }}
+                  >
+                    {passwordFeedback.type === 'error' ? <AlertCircle size={15} /> : <CheckCircle size={15} />}
+                    <span>{passwordFeedback.message}</span>
+                  </div>
+                )}
+
+                <div className="form-group" style={{ marginBottom: '12px' }}>
+                  <label className="form-label">New Password</label>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type={showNewPassword ? 'text' : 'password'}
+                      value={passwordData.newPassword}
+                      onChange={(e) =>
+                        setPasswordData((prev) => ({ ...prev, newPassword: e.target.value }))
+                      }
+                      placeholder="Enter minimum 6 characters"
+                      className="form-input"
+                      style={{ paddingRight: '40px' }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      style={{
+                        position: 'absolute',
+                        right: '10px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'none',
+                        border: 'none',
+                        color: '#94a3b8',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center'
+                      }}
+                      title={showNewPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="form-group" style={{ marginBottom: '14px' }}>
+                  <label className="form-label">Confirm New Password</label>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      value={passwordData.confirmPassword}
+                      onChange={(e) =>
+                        setPasswordData((prev) => ({ ...prev, confirmPassword: e.target.value }))
+                      }
+                      placeholder="Re-enter new password"
+                      className="form-input"
+                      style={{ paddingRight: '40px' }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      style={{
+                        position: 'absolute',
+                        right: '10px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'none',
+                        border: 'none',
+                        color: '#94a3b8',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center'
+                      }}
+                      title={showConfirmPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', flexWrap: 'wrap' }}>
+                  <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+                    Password must be at least 6 characters.
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handlePasswordOnlyUpdate}
+                    disabled={passwordSaving || !passwordData.newPassword}
+                    className="btn-primary"
+                    style={{
+                      padding: '8px 16px',
+                      fontSize: '0.8rem',
+                      background: 'linear-gradient(135deg, #2563eb 0%, #4f46e5 100%)'
+                    }}
+                  >
+                    {passwordSaving ? (
+                      <>
+                        <Loader2 size={13} className="spin" />
+                        <span>Updating...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Lock size={13} />
+                        <span>Update Password</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </div>

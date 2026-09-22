@@ -15,7 +15,11 @@ import {
   ArrowRight,
   ShieldCheck,
   User as UserIcon,
-  Loader2
+  Loader2,
+  Lock,
+  Eye,
+  EyeOff,
+  AlertCircle
 } from 'lucide-react';
 import api from '../../services/api';
 
@@ -167,6 +171,55 @@ const ClientOverview = ({ onOpenRequestModal }) => {
 
 const ClientProfile = () => {
   const { user } = useAuth();
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [savingPassword, setSavingPassword] = useState(false);
+  const [feedback, setFeedback] = useState({ type: '', message: '' });
+
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+    if (!newPassword) {
+      setFeedback({ type: 'error', message: 'Please enter a new password.' });
+      return;
+    }
+    if (newPassword.trim().length < 6) {
+      setFeedback({ type: 'error', message: 'New password must be at least 6 characters.' });
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setFeedback({ type: 'error', message: 'New password and confirmation do not match.' });
+      return;
+    }
+
+    setSavingPassword(true);
+    setFeedback({ type: '', message: '' });
+
+    try {
+      const res = await api.put('/auth/update-password', {
+        currentPassword: currentPassword.trim(),
+        newPassword: newPassword.trim()
+      });
+      if (res.data.success) {
+        setFeedback({ type: 'success', message: 'Your password has been updated successfully!' });
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+        setTimeout(() => setFeedback({ type: '', message: '' }), 4000);
+      }
+    } catch (err) {
+      setFeedback({
+        type: 'error',
+        message: err.response?.data?.message || 'Failed to update password.'
+      });
+    } finally {
+      setSavingPassword(false);
+    }
+  };
+
   return (
     <div className="main-container">
       <Header breadcrumb="Client Profile" />
@@ -182,26 +235,180 @@ const ClientProfile = () => {
         </div>
       </div>
 
-      <div className="data-card" style={{ padding: '28px', maxWidth: '680px' }}>
-        <div className="form-group">
-          <label className="form-label">Full Name</label>
-          <input className="form-input" value={user?.name || ''} readOnly disabled />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px', maxWidth: '1000px' }}>
+        {/* Account Details Card */}
+        <div className="data-card" style={{ padding: '24px' }}>
+          <div className="form-section-title" style={{ marginBottom: '18px' }}>
+            Profile Overview
+          </div>
+          <div className="form-group">
+            <label className="form-label">Full Name</label>
+            <input className="form-input" value={user?.name || ''} readOnly disabled />
+          </div>
+          <div className="form-group" style={{ marginTop: '14px' }}>
+            <label className="form-label">Email Address</label>
+            <input className="form-input" value={user?.email || ''} readOnly disabled />
+          </div>
+          <div className="form-group" style={{ marginTop: '14px' }}>
+            <label className="form-label">Company / Organization</label>
+            <input className="form-input" value={user?.company || 'N/A'} readOnly disabled />
+          </div>
+          <div className="form-group" style={{ marginTop: '14px' }}>
+            <label className="form-label">Contact Phone</label>
+            <input className="form-input" value={user?.phone || 'N/A'} readOnly disabled />
+          </div>
+          <div className="form-group" style={{ marginTop: '14px' }}>
+            <label className="form-label">Role</label>
+            <input className="form-input" value="Authorized Client" readOnly disabled />
+          </div>
         </div>
-        <div className="form-group" style={{ marginTop: '16px' }}>
-          <label className="form-label">Email Address</label>
-          <input className="form-input" value={user?.email || ''} readOnly disabled />
-        </div>
-        <div className="form-group" style={{ marginTop: '16px' }}>
-          <label className="form-label">Company / Organization</label>
-          <input className="form-input" value={user?.company || 'N/A'} readOnly disabled />
-        </div>
-        <div className="form-group" style={{ marginTop: '16px' }}>
-          <label className="form-label">Contact Phone</label>
-          <input className="form-input" value={user?.phone || 'N/A'} readOnly disabled />
-        </div>
-        <div className="form-group" style={{ marginTop: '16px' }}>
-          <label className="form-label">Role</label>
-          <input className="form-input" value="Authorized Client" readOnly disabled />
+
+        {/* Change Password Card */}
+        <div className="data-card" style={{ padding: '24px' }}>
+          <div className="form-section-title" style={{ marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <ShieldCheck size={18} style={{ color: '#2563eb' }} />
+            <span>Account Security & Password</span>
+          </div>
+          <p style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '18px' }}>
+            Update your account password to keep your client portal access secure.
+          </p>
+
+          {feedback.message && (
+            <div
+              className={`alert-banner ${feedback.type === 'error' ? 'alert-danger' : 'alert-success'}`}
+              style={{ marginBottom: '16px' }}
+            >
+              {feedback.type === 'error' ? <AlertCircle size={15} /> : <CheckCircle2 size={15} />}
+              <span>{feedback.message}</span>
+            </div>
+          )}
+
+          <form onSubmit={handlePasswordChange}>
+            <div className="form-group" style={{ marginBottom: '14px' }}>
+              <label className="form-label">Current Password</label>
+              <div style={{ position: 'relative' }}>
+                <input
+                  type={showCurrentPassword ? 'text' : 'password'}
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  placeholder="Enter current password"
+                  className="form-input"
+                  style={{ paddingRight: '40px' }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                  style={{
+                    position: 'absolute',
+                    right: '10px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'none',
+                    border: 'none',
+                    color: '#94a3b8',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}
+                >
+                  {showCurrentPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div>
+
+            <div className="form-group" style={{ marginBottom: '14px' }}>
+              <label className="form-label">New Password</label>
+              <div style={{ position: 'relative' }}>
+                <input
+                  type={showNewPassword ? 'text' : 'password'}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="At least 6 characters"
+                  className="form-input"
+                  style={{ paddingRight: '40px' }}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  style={{
+                    position: 'absolute',
+                    right: '10px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'none',
+                    border: 'none',
+                    color: '#94a3b8',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}
+                >
+                  {showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div>
+
+            <div className="form-group" style={{ marginBottom: '18px' }}>
+              <label className="form-label">Confirm New Password</label>
+              <div style={{ position: 'relative' }}>
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Re-enter new password"
+                  className="form-input"
+                  style={{ paddingRight: '40px' }}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  style={{
+                    position: 'absolute',
+                    right: '10px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'none',
+                    border: 'none',
+                    color: '#94a3b8',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}
+                >
+                  {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="btn-primary"
+              disabled={savingPassword}
+              style={{
+                width: '100%',
+                padding: '10px 18px',
+                background: 'linear-gradient(135deg, #2563eb 0%, #4f46e5 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px'
+              }}
+            >
+              {savingPassword ? (
+                <>
+                  <Loader2 size={16} className="spin" />
+                  <span>Updating Password...</span>
+                </>
+              ) : (
+                <>
+                  <Lock size={16} />
+                  <span>Save New Password</span>
+                </>
+              )}
+            </button>
+          </form>
         </div>
       </div>
     </div>

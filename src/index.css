@@ -1624,3 +1624,281 @@ input, button, select, textarea {
     max-width: 100%;
   }
 }
+
+/* ============================================================
+   70/30 SQUARE SPLIT MODAL & TASK FLOW
+   ============================================================ */
+
+.split-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 70;
+  padding: 16px;
+  animation: fadeIn 0.15s ease-out;
+}
+
+.split-modal-container {
+  background: #ffffff;
+  border-radius: 12px;
+  width: 980px;
+  max-width: 96vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.28), 0 0 0 1px rgba(15, 23, 42, 0.08);
+  border: 1px solid #cbd5e1;
+  overflow: hidden;
+  animation: scaleIn 0.2s ease-out;
+}
+
+.split-modal-header {
+  padding: 18px 24px;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+}
+
+.split-modal-body {
+  display: grid;
+  grid-template-columns: 68% 32%;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.split-panel-70 {
+  padding: 24px 28px;
+  overflow-y: auto;
+  border-right: 1px solid #e2e8f0;
+  background: #ffffff;
+}
+
+.split-panel-30 {
+  padding: 24px 20px;
+  overflow-y: auto;
+  background: #f8fafc;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Detail Info Box in 70% Panel */
+.split-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.split-info-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.split-info-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.split-info-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.split-description-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-top: 14px;
+}
+
+/* Taskflow Elements */
+.taskflow-header {
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.taskflow-title {
+  font-size: 0.88rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.taskflow-subtitle {
+  font-size: 0.73rem;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+.taskflow-list {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  gap: 16px;
+}
+
+/* Vertical line connecting steps */
+.taskflow-list::before {
+  content: '';
+  position: absolute;
+  left: 20px;
+  top: 24px;
+  bottom: 24px;
+  width: 2px;
+  background: #e2e8f0;
+  z-index: 1;
+}
+
+.taskflow-step {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.taskflow-step.active-step {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
+}
+
+.taskflow-step.completed-step {
+  background: rgba(240, 253, 244, 0.6);
+  border-color: #bbf7d0;
+}
+
+.taskflow-step.is-admin-clickable {
+  cursor: pointer;
+}
+
+.taskflow-step.is-admin-clickable:hover {
+  background: #ffffff;
+  border-color: #93c5fd;
+  transform: translateX(3px);
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.1);
+}
+
+.taskflow-step-icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.taskflow-step.active-step .taskflow-step-icon-wrap {
+  border-color: #10b981;
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.taskflow-step.completed-step .taskflow-step-icon-wrap {
+  border-color: #10b981;
+  background: #10b981;
+  color: #ffffff;
+}
+
+/* Green dot on active status */
+.status-green-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
+  display: inline-block;
+  animation: pulseGreen 1.8s infinite;
+  flex-shrink: 0;
+}
+
+@keyframes pulseGreen {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 7px rgba(16, 185, 129, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+.taskflow-step-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.taskflow-step-label {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.taskflow-step.active-step .taskflow-step-label {
+  color: #047857;
+}
+
+.taskflow-step-desc {
+  font-size: 0.72rem;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+/* Status Badges for In Progress */
+.status-badge.in-progress {
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+}
+
+/* Responsive collapse on smaller screens */
+@media (max-width: 820px) {
+  .split-modal-body {
+    grid-template-columns: 1fr;
+  }
+  .split-panel-70 {
+    border-right: none;
+    border-bottom: 1px solid #e2e8f0;
+  }
+}
+

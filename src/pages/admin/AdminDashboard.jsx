@@ -27,7 +27,7 @@ export const AdminDashboard = () => {
               </div>
             }
           />
-          <Route path="*" element={<Navigate to="clients" replace />} />
+          <Route path="*" element={<Navigate to="analytics" replace />} />
         </Routes>
       </main>
     </div>

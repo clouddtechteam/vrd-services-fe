@@ -38,17 +38,7 @@ export const Login = () => {
     }
   };
 
-  const fillAdmin = () => {
-    setEmail('admin@vrdgroups.com');
-    setPassword('password123');
-    setError('');
-  };
 
-  const fillClient = () => {
-    setEmail('john.doe@vrdgroups.com');
-    setPassword('password123');
-    setError('');
-  };
 
   return (
     <div className="login-page-container">
@@ -152,47 +142,7 @@ export const Login = () => {
           Client registration is restricted. Client accounts are exclusively provisioned by administrators.
         </div>
 
-        {/* Quick Demo Credentials Box */}
-        <div className="quick-seed-box">
-          <div className="quick-seed-title">
-            <ShieldCheck size={15} style={{ color: '#2563eb' }} />
-            Quick Demo Credentials (Click to Fill):
-          </div>
-          <div style={{ display: 'flex', gap: '8px', marginTop: '8px', flexWrap: 'wrap' }}>
-            <button
-              type="button"
-              onClick={fillAdmin}
-              style={{
-                padding: '6px 10px',
-                borderRadius: '6px',
-                border: '1px solid #cbd5e1',
-                background: '#ffffff',
-                fontSize: '0.75rem',
-                cursor: 'pointer',
-                fontWeight: 600,
-                color: '#1e40af'
-              }}
-            >
-              Fill Admin (admin@vrdgroups.com)
-            </button>
-            <button
-              type="button"
-              onClick={fillClient}
-              style={{
-                padding: '6px 10px',
-                borderRadius: '6px',
-                border: '1px solid #cbd5e1',
-                background: '#ffffff',
-                fontSize: '0.75rem',
-                cursor: 'pointer',
-                fontWeight: 600,
-                color: '#475569'
-              }}
-            >
-              Fill Client (john.doe@vrdgroups.com)
-            </button>
-          </div>
-        </div>
+
       </div>
     </div>
   );

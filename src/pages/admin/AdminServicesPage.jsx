@@ -15,7 +15,7 @@ import {
 import api from '../../services/api';
 import { Header } from '../../components/Header';
 import { ServiceTypesDrawer } from '../../components/ServiceTypesDrawer';
-import { ServiceRequestDetailsDrawer } from '../../components/ServiceRequestDetailsDrawer';
+import { ServiceDetailModal } from '../../components/ServiceDetailModal';
 import { ServiceStatusControl } from '../../components/ServiceStatusControl';
 
 const AVATAR_COLORS = ['#6366f1', '#2563eb', '#7c3aed', '#059669', '#d97706', '#db2777'];
@@ -160,6 +160,23 @@ export const AdminServicesPage = () => {
               </button>
               <button
                 type="button"
+                onClick={() => setStatusFilter('In Progress')}
+                style={{
+                  padding: '4px 10px',
+                  borderRadius: '999px',
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  border: '1px solid',
+                  borderColor: statusFilter === 'In Progress' ? '#2563eb' : '#cbd5e1',
+                  background: statusFilter === 'In Progress' ? '#eff6ff' : '#ffffff',
+                  color: statusFilter === 'In Progress' ? '#2563eb' : '#64748b'
+                }}
+              >
+                In Progress
+              </button>
+              <button
+                type="button"
                 onClick={() => setStatusFilter('Completed')}
                 style={{
                   padding: '4px 10px',
@@ -246,6 +263,7 @@ export const AdminServicesPage = () => {
                     : 'N/A';
 
                   const isPending = service.status === 'Pending';
+                  const isInProgress = service.status === 'In Progress';
                   const isCancelled = service.status === 'Cancelled';
 
                   return (
@@ -274,11 +292,16 @@ export const AdminServicesPage = () => {
                         </div>
                       </td>
 
-                      {/* Service Type */}
+                      {/* Service Type & Store */}
                       <td data-label="Service">
                         <div style={{ fontWeight: 600, color: '#1e293b' }}>
                           {service.serviceType}
                         </div>
+                        {service.storeName && (
+                          <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                            {service.storeName} {service.storeCode ? `(${service.storeCode})` : ''}
+                          </div>
+                        )}
                       </td>
 
                       {/* Request Date */}
@@ -299,8 +322,26 @@ export const AdminServicesPage = () => {
 
                       {/* Current Status */}
                       <td data-label="Status">
-                        <span className={`status-badge ${isPending ? 'pending' : isCancelled ? 'cancelled' : 'completed'}`}>
-                          {isPending ? <Clock size={12} /> : isCancelled ? <XCircle size={12} /> : <CheckCircle2 size={12} />}
+                        <span
+                          className={`status-badge ${
+                            isPending
+                              ? 'pending'
+                              : isInProgress
+                              ? 'in-progress'
+                              : isCancelled
+                              ? 'cancelled'
+                              : 'completed'
+                          }`}
+                        >
+                          {isPending ? (
+                            <Clock size={12} />
+                          ) : isInProgress ? (
+                            <Clock size={12} />
+                          ) : isCancelled ? (
+                            <XCircle size={12} />
+                          ) : (
+                            <CheckCircle2 size={12} />
+                          )}
                           <span>{service.status}</span>
                         </span>
                       </td>
@@ -373,10 +414,12 @@ export const AdminServicesPage = () => {
         onServiceTypesChanged={() => fetchServices(pagination.page, search, statusFilter)}
       />
 
-      {/* Expanded Service Request Details Drawer */}
-      <ServiceRequestDetailsDrawer
+      {/* Expanded Service Request Details 70/30 Modal with Admin Interactivity */}
+      <ServiceDetailModal
         service={selectedService}
+        isOpen={Boolean(selectedService)}
         onClose={() => setSelectedService(null)}
+        isAdmin={true}
         onServiceUpdated={handleServiceUpdated}
       />
     </div>

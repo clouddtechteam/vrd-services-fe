@@ -61,6 +61,7 @@ export const ServiceStatusControl = ({ service, onStatusChanged }) => {
   };
 
   const isPending = service.status === 'Pending';
+  const isInProgress = service.status === 'In Progress';
   const isCompleted = service.status === 'Completed';
   const isCancelled = service.status === 'Cancelled';
 
@@ -72,6 +73,35 @@ export const ServiceStatusControl = ({ service, onStatusChanged }) => {
     >
       {/* Primary Action Button / Badge */}
       {isPending ? (
+        <button
+          type="button"
+          onClick={() => handleUpdate('In Progress')}
+          disabled={loading}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '6px 12px',
+            borderRadius: '6px',
+            background: '#2563eb',
+            color: '#ffffff',
+            border: 'none',
+            fontSize: '0.775rem',
+            fontWeight: 700,
+            cursor: loading ? 'not-allowed' : 'pointer',
+            boxShadow: '0 2px 4px rgba(37, 99, 235, 0.25)',
+            transition: 'all 0.15s ease'
+          }}
+          title="Click to Start Work (In Progress)"
+        >
+          {loading ? (
+            <Loader2 size={13} className="spin" />
+          ) : (
+            <Clock size={13} />
+          )}
+          <span>Start Progress</span>
+        </button>
+      ) : isInProgress ? (
         <button
           type="button"
           onClick={() => handleUpdate('Completed')}
@@ -98,7 +128,7 @@ export const ServiceStatusControl = ({ service, onStatusChanged }) => {
           ) : (
             <CheckCircle size={13} />
           )}
-          <span>Mark Complete</span>
+          <span>Complete</span>
         </button>
       ) : isCompleted ? (
         <span
@@ -148,6 +178,18 @@ export const ServiceStatusControl = ({ service, onStatusChanged }) => {
           <div style={{ padding: '4px 8px', fontSize: '0.68rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase' }}>
             Change Status:
           </div>
+
+          {!isInProgress && !isCompleted && (
+            <button
+              type="button"
+              className="status-menu-item"
+              style={{ color: '#2563eb' }}
+              onClick={() => handleUpdate('In Progress')}
+            >
+              <Clock size={13} />
+              <span>In Progress</span>
+            </button>
+          )}
 
           {!isCompleted && (
             <button

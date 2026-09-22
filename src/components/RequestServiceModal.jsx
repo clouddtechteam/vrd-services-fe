@@ -3,16 +3,25 @@ import {
   X,
   PlusCircle,
   Calendar,
-  FileText,
   Layers,
   Info,
   Loader2,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  User,
+  Store,
+  Hash,
+  Mail,
+  Phone,
+  Clock,
+  ArrowRight,
+  CheckCircle2
 } from 'lucide-react';
 import api from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 export const RequestServiceModal = ({ isOpen, onClose, onServiceRequested }) => {
+  const { user } = useAuth();
   const [serviceTypes, setServiceTypes] = useState([]);
   const [loadingTypes, setLoadingTypes] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -21,6 +30,11 @@ export const RequestServiceModal = ({ isOpen, onClose, onServiceRequested }) => 
 
   const [formData, setFormData] = useState({
     serviceType: '',
+    managerName: '',
+    storeName: '',
+    storeCode: '',
+    email: '',
+    phone: '',
     expectedDate: '',
     description: '',
     additionalInfo: ''
@@ -36,12 +50,17 @@ export const RequestServiceModal = ({ isOpen, onClose, onServiceRequested }) => 
       setSuccess(false);
       setFormData({
         serviceType: '',
+        managerName: user?.name || '',
+        storeName: user?.company || '',
+        storeCode: '',
+        email: user?.email || '',
+        phone: user?.phone || '',
         expectedDate: '',
         description: '',
         additionalInfo: ''
       });
     }
-  }, [isOpen]);
+  }, [isOpen, user]);
 
   const fetchServiceTypes = async () => {
     setLoadingTypes(true);
@@ -71,12 +90,26 @@ export const RequestServiceModal = ({ isOpen, onClose, onServiceRequested }) => 
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const selectedTypeObj = serviceTypes.find((st) => st.name === formData.serviceType);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.serviceType) {
       setError('Please choose a service type.');
+      return;
+    }
+    if (!formData.managerName.trim()) {
+      setError('Please enter the manager name.');
+      return;
+    }
+    if (!formData.storeName.trim()) {
+      setError('Please enter the store name.');
+      return;
+    }
+    if (!formData.storeCode.trim()) {
+      setError('Please enter the store code.');
+      return;
+    }
+    if (!formData.email.trim()) {
+      setError('Please enter an email address.');
       return;
     }
     if (!formData.expectedDate) {
@@ -110,19 +143,18 @@ export const RequestServiceModal = ({ isOpen, onClose, onServiceRequested }) => 
   };
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
+    <div className="split-modal-backdrop" onClick={onClose}>
       <div
-        className="modal-dialog"
-        style={{ width: '560px' }}
+        className="split-modal-container"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="modal-header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div className="split-modal-header">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div
               style={{
-                width: '36px',
-                height: '36px',
+                width: '38px',
+                height: '38px',
                 borderRadius: '8px',
                 background: 'linear-gradient(135deg, #059669 0%, #2563eb 100%)',
                 display: 'flex',
@@ -134,9 +166,11 @@ export const RequestServiceModal = ({ isOpen, onClose, onServiceRequested }) => 
               <PlusCircle size={20} />
             </div>
             <div>
-              <div className="modal-title">Request a Service</div>
+              <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a' }}>
+                {formData.serviceType || 'New Service Request'}
+              </div>
               <div style={{ fontSize: '0.78rem', color: '#64748b' }}>
-                Fill out the service requirements to initiate a new request
+                Fill out the required store specifications to initiate service workflow
               </div>
             </div>
           </div>
@@ -145,201 +179,375 @@ export const RequestServiceModal = ({ isOpen, onClose, onServiceRequested }) => 
           </button>
         </div>
 
-        {/* Modal Body */}
-        <form onSubmit={handleSubmit}>
-          <div className="modal-body" style={{ maxHeight: '72vh', overflowY: 'auto' }}>
-            {/* Feedback Alerts */}
-            {error && (
-              <div className="alert-banner alert-danger">
-                <AlertCircle size={16} style={{ flexShrink: 0 }} />
-                <span>{error}</span>
-              </div>
-            )}
-
-            {success && (
-              <div className="alert-banner alert-success">
-                <CheckCircle size={16} style={{ flexShrink: 0 }} />
-                <span>Service request submitted successfully! Initial status: Pending.</span>
-              </div>
-            )}
-
-            {/* Service Type Dropdown from DB */}
-            <div className="form-group">
-              <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>Service Type *</span>
-                {loadingTypes && (
-                  <span style={{ fontSize: '0.75rem', color: '#2563eb', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <Loader2 size={12} className="spin" /> Loading categories...
-                  </span>
-                )}
-              </label>
-              <div style={{ position: 'relative' }}>
-                <select
-                  name="serviceType"
-                  value={formData.serviceType}
-                  onChange={handleChange}
-                  className="form-input"
-                  style={{ paddingLeft: '38px', appearance: 'auto' }}
-                  disabled={loadingTypes || submitting}
-                  required
-                >
-                  {serviceTypes.map((st) => (
-                    <option key={st._id} value={st.name}>
-                      {st.name}
-                    </option>
-                  ))}
-                </select>
-                <Layers
-                  size={16}
-                  style={{
-                    position: 'absolute',
-                    left: '12px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    color: '#94a3b8',
-                    pointerEvents: 'none'
-                  }}
-                />
-              </div>
-              {selectedTypeObj?.description && (
-                <div
-                  style={{
-                    marginTop: '6px',
-                    fontSize: '0.78rem',
-                    color: '#475569',
-                    background: '#f8fafc',
-                    padding: '8px 12px',
-                    borderRadius: '6px',
-                    border: '1px solid #e2e8f0',
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '6px'
-                  }}
-                >
-                  <Info size={14} style={{ color: '#2563eb', marginTop: '2px', flexShrink: 0 }} />
-                  <span>{selectedTypeObj.description}</span>
+        {/* 70 / 30 Body */}
+        <div className="split-modal-body">
+          {/* Left Panel - 70% Form */}
+          <div className="split-panel-70">
+            <form onSubmit={handleSubmit} id="request-service-form">
+              {error && (
+                <div className="alert-banner alert-danger" style={{ marginBottom: '14px' }}>
+                  <AlertCircle size={16} style={{ flexShrink: 0 }} />
+                  <span>{error}</span>
                 </div>
               )}
-            </div>
 
-            {/* Expected Date Picker */}
-            <div className="form-group" style={{ marginTop: '16px' }}>
-              <label className="form-label">Expected Date *</label>
-              <div style={{ position: 'relative' }}>
-                <input
-                  type="date"
-                  name="expectedDate"
-                  min={todayDateString}
-                  value={formData.expectedDate}
-                  onChange={handleChange}
-                  className="form-input"
-                  style={{ paddingLeft: '38px' }}
-                  disabled={submitting}
-                  required
-                />
-                <Calendar
-                  size={16}
-                  style={{
-                    position: 'absolute',
-                    left: '12px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    color: '#94a3b8',
-                    pointerEvents: 'none'
-                  }}
-                />
-              </div>
-              <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '4px' }}>
-                Date on which your organization expects the service to be carried out
-              </div>
-            </div>
+              {success && (
+                <div className="alert-banner alert-success" style={{ marginBottom: '14px' }}>
+                  <CheckCircle size={16} style={{ flexShrink: 0 }} />
+                  <span>Service request created successfully! Initial status set to Pending.</span>
+                </div>
+              )}
 
-            {/* Description Textarea */}
-            <div className="form-group" style={{ marginTop: '16px' }}>
-              <label className="form-label">Service Description *</label>
-              <div style={{ position: 'relative' }}>
+              {/* Service Type Selection */}
+              <div className="form-group" style={{ marginBottom: '16px' }}>
+                <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span>Service Category *</span>
+                  {loadingTypes && (
+                    <span style={{ fontSize: '0.75rem', color: '#2563eb', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <Loader2 size={12} className="spin" /> Loading categories...
+                    </span>
+                  )}
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <select
+                    name="serviceType"
+                    value={formData.serviceType}
+                    onChange={handleChange}
+                    className="form-input"
+                    style={{ paddingLeft: '38px', appearance: 'auto' }}
+                    disabled={loadingTypes || submitting}
+                    required
+                  >
+                    {serviceTypes.map((st) => (
+                      <option key={st._id} value={st.name}>
+                        {st.name}
+                      </option>
+                    ))}
+                  </select>
+                  <Layers
+                    size={16}
+                    style={{
+                      position: 'absolute',
+                      left: '12px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      color: '#94a3b8',
+                      pointerEvents: 'none'
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Two Column Grid for Manager Name & Store Name */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '14px' }}>
+                <div className="form-group">
+                  <label className="form-label">Manager Name *</label>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type="text"
+                      name="managerName"
+                      value={formData.managerName}
+                      onChange={handleChange}
+                      placeholder="e.g. John Doe"
+                      className="form-input"
+                      style={{ paddingLeft: '38px' }}
+                      disabled={submitting}
+                      required
+                    />
+                    <User
+                      size={16}
+                      style={{
+                        position: 'absolute',
+                        left: '12px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        color: '#94a3b8',
+                        pointerEvents: 'none'
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Store Name *</label>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type="text"
+                      name="storeName"
+                      value={formData.storeName}
+                      onChange={handleChange}
+                      placeholder="e.g. Downtown Branch #12"
+                      className="form-input"
+                      style={{ paddingLeft: '38px' }}
+                      disabled={submitting}
+                      required
+                    />
+                    <Store
+                      size={16}
+                      style={{
+                        position: 'absolute',
+                        left: '12px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        color: '#94a3b8',
+                        pointerEvents: 'none'
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Two Column Grid for Store Code & Email */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '14px' }}>
+                <div className="form-group">
+                  <label className="form-label">Store Code *</label>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type="text"
+                      name="storeCode"
+                      value={formData.storeCode}
+                      onChange={handleChange}
+                      placeholder="e.g. STR-4029"
+                      className="form-input"
+                      style={{ paddingLeft: '38px' }}
+                      disabled={submitting}
+                      required
+                    />
+                    <Hash
+                      size={16}
+                      style={{
+                        position: 'absolute',
+                        left: '12px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        color: '#94a3b8',
+                        pointerEvents: 'none'
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Email *</label>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      placeholder="manager@store.com"
+                      className="form-input"
+                      style={{ paddingLeft: '38px' }}
+                      disabled={submitting}
+                      required
+                    />
+                    <Mail
+                      size={16}
+                      style={{
+                        position: 'absolute',
+                        left: '12px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        color: '#94a3b8',
+                        pointerEvents: 'none'
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Two Column Grid for Phone (Optional) & Expected Date */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '14px' }}>
+                <div className="form-group">
+                  <label className="form-label">
+                    Phone Number <span style={{ textTransform: 'none', fontWeight: 400, color: '#94a3b8' }}>(Optional)</span>
+                  </label>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      placeholder="+1 (555) 000-0000"
+                      className="form-input"
+                      style={{ paddingLeft: '38px' }}
+                      disabled={submitting}
+                    />
+                    <Phone
+                      size={16}
+                      style={{
+                        position: 'absolute',
+                        left: '12px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        color: '#94a3b8',
+                        pointerEvents: 'none'
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Expected Date *</label>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type="date"
+                      name="expectedDate"
+                      min={todayDateString}
+                      value={formData.expectedDate}
+                      onChange={handleChange}
+                      className="form-input"
+                      style={{ paddingLeft: '38px' }}
+                      disabled={submitting}
+                      required
+                    />
+                    <Calendar
+                      size={16}
+                      style={{
+                        position: 'absolute',
+                        left: '12px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        color: '#94a3b8',
+                        pointerEvents: 'none'
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Description */}
+              <div className="form-group" style={{ marginBottom: '20px' }}>
+                <label className="form-label">Description *</label>
                 <textarea
                   name="description"
                   rows={3}
                   value={formData.description}
                   onChange={handleChange}
-                  placeholder="Specify location, scope, equipment identifiers, or key requirements..."
+                  placeholder="Provide scope, equipment identifiers, specific requirements, or access notes..."
                   className="form-input"
                   style={{ resize: 'vertical', minHeight: '80px' }}
                   disabled={submitting}
                   required
                 />
               </div>
+
+              {/* Submit Buttons */}
+              <div style={{ display: 'flex', justifyContent: 'flex-start', gap: '12px', paddingTop: '6px' }}>
+                <button
+                  type="submit"
+                  className="btn-primary"
+                  disabled={submitting || loadingTypes}
+                  style={{
+                    background: 'linear-gradient(135deg, #059669 0%, #2563eb 100%)',
+                    padding: '10px 24px',
+                    boxShadow: '0 4px 12px rgba(5, 150, 105, 0.3)'
+                  }}
+                >
+                  {submitting ? (
+                    <>
+                      <Loader2 size={16} className="spin" />
+                      <span>Submitting...</span>
+                    </>
+                  ) : (
+                    <>
+                      <PlusCircle size={16} />
+                      <span>Submit</span>
+                    </>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={onClose}
+                  disabled={submitting}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+
+          {/* Right Panel - 30% Task Flow */}
+          <div className="split-panel-30">
+            <div className="taskflow-header">
+              <div className="taskflow-title">
+                <Clock size={16} style={{ color: '#2563eb' }} />
+                <span>Task Flow</span>
+              </div>
+              <div className="taskflow-subtitle">
+                Workflow stages for this service request
+              </div>
             </div>
 
-            {/* Additional Information Textarea */}
-            <div className="form-group" style={{ marginTop: '16px' }}>
-              <label className="form-label">
-                Additional Information <span style={{ textTransform: 'none', fontWeight: 400, color: '#94a3b8' }}>(Optional)</span>
-              </label>
-              <textarea
-                name="additionalInfo"
-                rows={2}
-                value={formData.additionalInfo}
-                onChange={handleChange}
-                placeholder="Access hours, security clearance notes, designated on-site contact..."
-                className="form-input"
-                style={{ resize: 'vertical', minHeight: '60px' }}
-                disabled={submitting}
-              />
+            <div className="taskflow-list">
+              {/* Step 1: Pending */}
+              <div className="taskflow-step active-step">
+                <div className="taskflow-step-icon-wrap">
+                  <Clock size={18} />
+                </div>
+                <div className="taskflow-step-content">
+                  <div className="taskflow-step-label">
+                    <span>1. Pending</span>
+                    <span className="status-green-dot" title="Initial active state" />
+                  </div>
+                  <div className="taskflow-step-desc">
+                    Initial status upon submitting. Queued for admin dispatch.
+                  </div>
+                </div>
+              </div>
+
+              {/* Step 2: In Progress */}
+              <div className="taskflow-step">
+                <div className="taskflow-step-icon-wrap" style={{ borderColor: '#e2e8f0', color: '#94a3b8' }}>
+                  <ArrowRight size={16} />
+                </div>
+                <div className="taskflow-step-content">
+                  <div className="taskflow-step-label" style={{ color: '#64748b' }}>
+                    <span>2. In Progress</span>
+                  </div>
+                  <div className="taskflow-step-desc">
+                    Technicians assigned and service actively underway.
+                  </div>
+                </div>
+              </div>
+
+              {/* Step 3: Completed */}
+              <div className="taskflow-step">
+                <div className="taskflow-step-icon-wrap" style={{ borderColor: '#e2e8f0', color: '#94a3b8' }}>
+                  <CheckCircle2 size={16} />
+                </div>
+                <div className="taskflow-step-content">
+                  <div className="taskflow-step-label" style={{ color: '#64748b' }}>
+                    <span>3. Completed</span>
+                  </div>
+                  <div className="taskflow-step-desc">
+                    Service successfully performed and closed out.
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {/* System Automation Notice */}
+            {/* Microcopy footer */}
             <div
               style={{
-                marginTop: '16px',
-                padding: '10px 14px',
-                borderRadius: '8px',
-                background: '#eff6ff',
-                border: '1px solid #bfdbfe',
-                fontSize: '0.78rem',
-                color: '#1e40af',
+                marginTop: 'auto',
+                paddingTop: '20px',
+                borderTop: '1px solid #e2e8f0',
+                fontSize: '0.73rem',
+                color: '#64748b',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px'
+                gap: '6px'
               }}
             >
-              <Info size={16} style={{ flexShrink: 0 }} />
+              <Info size={14} style={{ color: '#2563eb', flexShrink: 0 }} />
               <span>
-                System automatically assigns a unique <strong>Request ID</strong>, timestamp, and sets initial status to <strong>Pending</strong>.
+                System automatically initializes requests at the <strong>Pending</strong> stage.
               </span>
             </div>
           </div>
-
-          {/* Modal Footer */}
-          <div className="modal-footer">
-            <button
-              type="button"
-              className="btn-secondary"
-              onClick={onClose}
-              disabled={submitting}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="btn-primary"
-              disabled={submitting || loadingTypes}
-            >
-              {submitting ? (
-                <>
-                  <Loader2 size={16} className="spin" />
-                  <span>Submitting...</span>
-                </>
-              ) : (
-                <>
-                  <PlusCircle size={16} />
-                  <span>Submit Request</span>
-                </>
-              )}
-            </button>
-          </div>
-        </form>
+        </div>
       </div>
     </div>
   );
