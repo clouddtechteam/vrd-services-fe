@@ -17,6 +17,7 @@ import { Header } from '../../components/Header';
 import { Link } from 'react-router-dom';
 
 export const AdminAnalytics = () => {
+  
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
