@@ -49,9 +49,7 @@ export const Login = () => {
 <img src="/LOGO.jpg" alt="Logo" style={{ width: "200px", height: "100px", objectFit: "contain", borderRadius: "6px" }} /> 
             </div>
           <h1 className="login-heading">VRD Service Management</h1>
-          <p className="login-subheading">
-            Sign in to access your administrative or client workspace
-          </p>
+          
         </div>
 
         {/* Error Alert */}
@@ -132,15 +130,7 @@ export const Login = () => {
         </form>
 
         {/* Client Registration Policy Notice */}
-        <div style={{
-          marginTop: '20px',
-          textAlign: 'center',
-          fontSize: '0.78rem',
-          color: '#64748b',
-          lineHeight: '1.4'
-        }}>
-          Client registration is restricted. Client accounts are exclusively provisioned by administrators.
-        </div>
+        
 
 
       </div>
