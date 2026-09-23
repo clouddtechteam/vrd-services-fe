@@ -1,6 +1,6 @@
 :root {
   --font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  
+
   /* Primary & Accent Palette */
   --primary-blue: #2563eb;
   --primary-blue-hover: #1d4ed8;
@@ -68,7 +68,10 @@ body {
   max-width: 100%;
 }
 
-input, button, select, textarea {
+input,
+button,
+select,
+textarea {
   font-family: inherit;
 }
 
@@ -103,6 +106,20 @@ input, button, select, textarea {
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+/* The sidebar uses a full logo rather than the standard 42px icon. */
+.sidebar-header .brand-icon-box {
+  width: 200px;
+  height: 100px;
+  margin-left: auto;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.sidebar-header .brand-icon-box img {
+  margin-left: 0 !important;
 }
 
 .brand-icon-box {
@@ -483,10 +500,21 @@ input, button, select, textarea {
   text-transform: uppercase;
 }
 
-.avatar-circle.blue { background: #2563eb; }
-.avatar-circle.purple { background: #7c3aed; }
-.avatar-circle.indigo { background: #4f46e5; }
-.avatar-circle.pink { background: #db2777; }
+.avatar-circle.blue {
+  background: #2563eb;
+}
+
+.avatar-circle.purple {
+  background: #7c3aed;
+}
+
+.avatar-circle.indigo {
+  background: #4f46e5;
+}
+
+.avatar-circle.pink {
+  background: #db2777;
+}
 
 .client-name {
   font-weight: 600;
@@ -604,13 +632,23 @@ input, button, select, textarea {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideLeft {
-  from { transform: translateX(100%); }
-  to { transform: translateX(0); }
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
 }
 
 .drawer-header {
@@ -972,6 +1010,7 @@ input, button, select, textarea {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -1130,7 +1169,7 @@ input, button, select, textarea {
   width: 40px;
   height: 40px;
   background: transparent;
-  border: 1px solid rgba(255,255,255,0.15);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: var(--radius-sm);
   color: white;
   cursor: pointer;
@@ -1138,7 +1177,7 @@ input, button, select, textarea {
 }
 
 .hamburger-btn:hover {
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 /* ── Tablet & Mobile (≤ 768px) ── */
@@ -1157,7 +1196,7 @@ input, button, select, textarea {
     background: var(--sidebar-bg);
     padding: 0 16px;
     z-index: 45;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   }
 
   .mobile-brand {
@@ -1175,7 +1214,7 @@ input, button, select, textarea {
     transform: translateX(-100%);
     transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
     z-index: 60;
-    box-shadow: 4px 0 24px rgba(0,0,0,0.35);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.35);
   }
 
   .app-sidebar.mobile-open {
@@ -1192,8 +1231,8 @@ input, button, select, textarea {
     right: 14px;
     width: 32px;
     height: 32px;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: var(--radius-sm);
     color: var(--sidebar-text-muted);
     cursor: pointer;
@@ -1202,7 +1241,7 @@ input, button, select, textarea {
   }
 
   .sidebar-mobile-close:hover {
-    background: rgba(255,255,255,0.15);
+    background: rgba(255, 255, 255, 0.15);
     color: white;
   }
 
@@ -1211,7 +1250,7 @@ input, button, select, textarea {
     display: block;
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.55);
+    background: rgba(0, 0, 0, 0.55);
     backdrop-filter: blur(2px);
     z-index: 55;
     animation: fadeIn 0.2s ease-out;
@@ -1275,7 +1314,7 @@ input, button, select, textarea {
     padding: 14px 16px;
   }
 
-  .card-header-bar > div:first-child {
+  .card-header-bar>div:first-child {
     flex-wrap: wrap;
   }
 
@@ -1501,7 +1540,7 @@ input, button, select, textarea {
   }
 
   /* Hide filter pills text wrapping */
-  .card-header-bar > div:first-child {
+  .card-header-bar>div:first-child {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
@@ -1574,6 +1613,7 @@ input, button, select, textarea {
     cursor: pointer;
     transition: background 0.12s ease;
   }
+
   .data-card .data-table tbody tr:active {
     background: #f1f5f9 !important;
   }
@@ -1587,7 +1627,7 @@ input, button, select, textarea {
   }
 
   /* Client cell: hide email sub-line */
-  .data-card .data-table tbody td[data-label="Client"] .user-cell > div > div:last-child {
+  .data-card .data-table tbody td[data-label="Client"] .user-cell>div>div:last-child {
     display: none;
   }
 
@@ -1603,7 +1643,7 @@ input, button, select, textarea {
   }
 
   /* Compact ServiceStatusControl on mobile - hide label text */
-  .data-card .data-table tbody td:last-child .status-dropdown-wrapper > button:first-child > span {
+  .data-card .data-table tbody td:last-child .status-dropdown-wrapper>button:first-child>span {
     display: none;
   }
 }
@@ -1612,6 +1652,7 @@ input, button, select, textarea {
    OVERFLOW FIX - keep all containers within viewport
    ============================================================ */
 @media (max-width: 768px) {
+
   /* Drop forced min-width - let scroll wrapper handle it for tablet */
   .data-table {
     min-width: unset;
@@ -1852,9 +1893,11 @@ input, button, select, textarea {
   0% {
     box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
   }
+
   70% {
     box-shadow: 0 0 0 7px rgba(16, 185, 129, 0);
   }
+
   100% {
     box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
   }
@@ -1896,9 +1939,9 @@ input, button, select, textarea {
   .split-modal-body {
     grid-template-columns: 1fr;
   }
+
   .split-panel-70 {
     border-right: none;
     border-bottom: 1px solid #e2e8f0;
   }
 }
-

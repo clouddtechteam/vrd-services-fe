@@ -46,7 +46,8 @@ export const Login = () => {
         {/* Brand Header */}
         <div className="login-brand-header">
           <div className="login-logo-box">
-    <img src="/favicon.jpg" alt="Logo" />          </div>
+<img src="/LOGO.jpg" alt="Logo" style={{ width: "200px", height: "100px", objectFit: "contain", borderRadius: "6px" }} /> 
+            </div>
           <h1 className="login-heading">VRD Service Management</h1>
           <p className="login-subheading">
             Sign in to access your administrative or client workspace
