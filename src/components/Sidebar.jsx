@@ -48,7 +48,7 @@ export const Sidebar = () => {
       <div className="mobile-topbar">
         <div className="mobile-brand">
           <div className="brand-icon-box" style={{ width: 34, height: 34, fontSize: '0.95rem' }}>
-            <Layers size={18} />
+            <img src="/favicon.jpg" alt="Logo" />
           </div>
           <span className="brand-title" style={{ fontSize: '0.95rem' }}>VRD Groups</span>
         </div>
@@ -84,7 +84,7 @@ export const Sidebar = () => {
         {/* Brand Header */}
         <div className="sidebar-header">
           <div className="brand-icon-box">
-            <Layers size={22} />
+            <img src="/favicon.jpg" alt="Logo" />
           </div>
           <div className="brand-info">
             <div className="brand-title">VRD Groups</div>
