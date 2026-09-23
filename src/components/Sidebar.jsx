@@ -48,8 +48,7 @@ export const Sidebar = () => {
       <div className="mobile-topbar">
         <div className="mobile-brand">
           <div className="brand-icon-box" style={{ width: 34, height: 34, fontSize: '0.95rem' }}>
-            <img src="/favicon.jpg" alt="Logo" />
-          </div>
+<img src="/favicon.jpg" alt="Logo" style={{ width: "40px", height: "40px", objectFit: "contain", borderRadius: "6px" }} />          </div>
           <span className="brand-title" style={{ fontSize: '0.95rem' }}>VRD Groups</span>
         </div>
         <button
@@ -84,8 +83,7 @@ export const Sidebar = () => {
         {/* Brand Header */}
         <div className="sidebar-header">
           <div className="brand-icon-box">
-            <img src="/favicon.jpg" alt="Logo" />
-          </div>
+<img src="/favicon.jpg" alt="Logo" style={{ width: "40px", height: "40px", objectFit: "contain", borderRadius: "6px" }} />          </div>
           <div className="brand-info">
             <div className="brand-title">VRD Groups</div>
             <div className="brand-subtitle">Service Management</div>
