@@ -4,6 +4,7 @@ import api from '../services/api';
 
 export const AddClientModal = ({ isOpen, onClose, onClientAdded }) => {
   const [formData, setFormData] = useState({
+    userId: '',
     name: '',
     email: '',
     password: '',
@@ -23,8 +24,8 @@ export const AddClientModal = ({ isOpen, onClose, onClientAdded }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.name || !formData.email || !formData.password) {
-      setError('Please fill in all required fields.');
+    if (!formData.userId.trim() || !formData.name.trim() || !formData.email.trim() || !formData.password) {
+      setError('Please fill in all required fields (User ID, Name, Email, Password).');
       return;
     }
     if (formData.password.length < 6) {
@@ -36,11 +37,16 @@ export const AddClientModal = ({ isOpen, onClose, onClientAdded }) => {
     setError('');
 
     try {
-      const res = await api.post('/clients', formData);
+      const res = await api.post('/clients', {
+        ...formData,
+        userId: formData.userId.trim(),
+        email: formData.email.trim()
+      });
       if (res.data.success) {
         onClientAdded(res.data.data);
         onClose();
         setFormData({
+          userId: '',
           name: '',
           email: '',
           password: '',
@@ -88,6 +94,22 @@ export const AddClientModal = ({ isOpen, onClose, onClientAdded }) => {
                 <span>{error}</span>
               </div>
             )}
+
+            <div className="form-group">
+              <label className="form-label">User ID *</label>
+              <input
+                type="text"
+                name="userId"
+                value={formData.userId}
+                onChange={handleChange}
+                placeholder="e.g. CLI-1001 or VRD-CLI-01"
+                className="form-input"
+                required
+              />
+              <span style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '4px', display: 'block' }}>
+                Unique identifier used by the client to sign in.
+              </span>
+            </div>
 
             <div className="form-group">
               <label className="form-label">Full Name *</label>

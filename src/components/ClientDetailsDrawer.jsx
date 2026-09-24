@@ -26,6 +26,7 @@ import { ServiceStatusControl } from './ServiceStatusControl';
 export const ClientDetailsDrawer = ({ client, onClose, onClientUpdated }) => {
   const [activeTab, setActiveTab] = useState('profile');
   const [formData, setFormData] = useState({
+    userId: '',
     name: '',
     email: '',
     phone: '',
@@ -53,6 +54,7 @@ export const ClientDetailsDrawer = ({ client, onClose, onClientUpdated }) => {
   useEffect(() => {
     if (client) {
       setFormData({
+        userId: client.userId || '',
         name: client.name || '',
         email: client.email || '',
         phone: client.phone || '',
@@ -106,8 +108,8 @@ export const ClientDetailsDrawer = ({ client, onClose, onClientUpdated }) => {
 
   const handleSave = async (e) => {
     e.preventDefault();
-    if (!formData.name.trim() || !formData.email.trim()) {
-      setFeedback({ type: 'error', message: 'Name and email are required.' });
+    if (!formData.userId.trim() || !formData.name.trim() || !formData.email.trim()) {
+      setFeedback({ type: 'error', message: 'User ID, full name, and email are required.' });
       return;
     }
 
@@ -221,6 +223,19 @@ export const ClientDetailsDrawer = ({ client, onClose, onClientUpdated }) => {
               <div className="drawer-meta-row">
                 <Mail size={13} />
                 <span>{formData.email || client.email}</span>
+                {(formData.userId || client.userId) && (
+                  <span style={{
+                    fontFamily: 'monospace',
+                    fontWeight: 600,
+                    background: '#eef2ff',
+                    color: '#4338ca',
+                    padding: '1px 6px',
+                    borderRadius: '4px',
+                    fontSize: '0.75rem'
+                  }}>
+                    {formData.userId || client.userId}
+                  </span>
+                )}
                 <span className="role-pill client">Client</span>
               </div>
             </div>
@@ -287,6 +302,19 @@ export const ClientDetailsDrawer = ({ client, onClose, onClientUpdated }) => {
           {activeTab === 'profile' && (
             <form id="client-form" onSubmit={handleSave}>
               <div className="form-section-title">Client Information</div>
+
+              <div className="form-group">
+                <label className="form-label">User ID *</label>
+                <input
+                  type="text"
+                  name="userId"
+                  value={formData.userId}
+                  onChange={handleChange}
+                  placeholder="Unique User ID"
+                  className="form-input"
+                  required
+                />
+              </div>
 
               <div className="form-group">
                 <label className="form-label">Full Name *</label>

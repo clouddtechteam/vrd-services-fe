@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Layers, Lock, Mail, AlertCircle, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Layers, Lock, Mail, User, AlertCircle, ArrowRight, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export const Login = () => {
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -14,8 +14,8 @@ export const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email || !password) {
-      setError('Please provide both email and password.');
+    if (!identifier || !password) {
+      setError('Please provide your User ID or email and password.');
       return;
     }
 
@@ -23,7 +23,7 @@ export const Login = () => {
     setError('');
 
     try {
-      const user = await login(email, password);
+      const user = await login(identifier, password);
       if (user.role === 'admin') {
         navigate('/admin/clients');
       } else {
@@ -31,7 +31,7 @@ export const Login = () => {
       }
     } catch (err) {
       setError(
-        err.response?.data?.message || err.message || 'Invalid email or password.'
+        err.response?.data?.message || err.message || 'Invalid User ID/email or password.'
       );
     } finally {
       setLoading(false);
@@ -46,10 +46,10 @@ export const Login = () => {
         {/* Brand Header */}
         <div className="login-brand-header">
           <div className="login-logo-box">
-<img src="/LOGO.jpg" alt="Logo" style={{ width: "200px", height: "100px", objectFit: "contain", borderRadius: "6px" }} /> 
-            </div>
+            <img src="/LOGO.jpg" alt="Logo" style={{ width: "200px", height: "100px", objectFit: "contain", borderRadius: "6px" }} />
+          </div>
           <h1 className="login-heading">VRD Service Management</h1>
-          
+
         </div>
 
         {/* Error Alert */}
@@ -63,18 +63,18 @@ export const Login = () => {
         {/* Form */}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label className="form-label">Email Address</label>
+            <label className="form-label">User ID or Email</label>
             <div style={{ position: 'relative' }}>
               <input
-                type="email"
+                type="text"
                 className="form-input"
                 style={{ paddingLeft: '38px' }}
-                placeholder="name@vrdgroups.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter Your User ID or Email ID"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
                 required
               />
-              <Mail
+              <User
                 size={16}
                 style={{
                   position: 'absolute',
@@ -94,7 +94,7 @@ export const Login = () => {
                 type="password"
                 className="form-input"
                 style={{ paddingLeft: '38px' }}
-                placeholder="••••••••••••"
+                placeholder="Enter Your Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -130,7 +130,7 @@ export const Login = () => {
         </form>
 
         {/* Client Registration Policy Notice */}
-        
+
 
 
       </div>

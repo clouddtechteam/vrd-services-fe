@@ -28,18 +28,21 @@ export const ExcelImportClientsDrawer = ({ isOpen, onClose, onClientsImported })
   const handleDownloadSample = () => {
     const sampleData = [
       {
+        'User ID': 'CLI-1001',
         Name: 'John Doe',
         Email: 'john.doe@example.com',
         Phone: '+1 (555) 234-5678',
         Company: 'Acme Health Solutions'
       },
       {
+        'User ID': 'CLI-1002',
         Name: 'Jane Smith',
         Email: 'jane.smith@example.com',
         Phone: '+1 (555) 345-6789',
         Company: 'Apex Diagnostics Lab'
       },
       {
+        'User ID': 'CLI-1003',
         Name: 'Alex Taylor',
         Email: 'alex.taylor@example.com',
         Phone: '+1 (555) 456-7890',
@@ -52,6 +55,7 @@ export const ExcelImportClientsDrawer = ({ isOpen, onClose, onClientsImported })
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Clients');
 
     worksheet['!cols'] = [
+      { wch: 18 },
       { wch: 25 },
       { wch: 30 },
       { wch: 18 },
@@ -79,6 +83,7 @@ export const ExcelImportClientsDrawer = ({ isOpen, onClose, onClientsImported })
         const rawData = XLSX.utils.sheet_to_json(ws);
 
         const mapped = rawData.map((row) => {
+          const userId = row['User ID'] || row['userId'] || row['UserId'] || row['user_id'] || '';
           const name = row['Name'] || row['name'] || row['Full Name'] || row['Client Name'] || '';
           const email = row['Email'] || row['email'] || row['Email Address'] || '';
           const phone = row['Phone'] || row['phone'] || row['Phone Number'] || '';
@@ -87,6 +92,7 @@ export const ExcelImportClientsDrawer = ({ isOpen, onClose, onClientsImported })
           const isValid = Boolean(name && email);
 
           return {
+            userId: String(userId).trim(),
             name: String(name).trim(),
             email: String(email).trim(),
             phone: String(phone).trim(),
@@ -322,6 +328,7 @@ export const ExcelImportClientsDrawer = ({ isOpen, onClose, onClientsImported })
                   <thead>
                     <tr>
                       <th style={{ padding: '8px 12px' }}>Status</th>
+                      <th style={{ padding: '8px 12px' }}>User ID</th>
                       <th style={{ padding: '8px 12px' }}>Name</th>
                       <th style={{ padding: '8px 12px' }}>Email</th>
                       <th style={{ padding: '8px 12px' }}>Company</th>
@@ -365,6 +372,9 @@ export const ExcelImportClientsDrawer = ({ isOpen, onClose, onClientsImported })
                               Missing Info
                             </span>
                           )}
+                        </td>
+                        <td style={{ padding: '8px 12px', fontFamily: 'monospace', color: '#4338ca' }}>
+                          {r.userId || <em style={{ color: '#94a3b8' }}>auto</em>}
                         </td>
                         <td style={{ padding: '8px 12px', fontWeight: 600, color: '#0f172a' }}>
                           {r.name || '<empty>'}

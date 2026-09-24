@@ -31,8 +31,14 @@ export const AuthProvider = ({ children }) => {
     verifyUser();
   }, [token]);
 
-  const login = async (email, password) => {
-    const res = await api.post('/auth/login', { email, password });
+  const login = async (identifier, password) => {
+    const trimmedId = (identifier || '').trim();
+    const res = await api.post('/auth/login', {
+      identifier: trimmedId,
+      email: trimmedId,
+      userId: trimmedId,
+      password
+    });
     if (res.data.success) {
       const { token: receivedToken, user: receivedUser } = res.data;
       setToken(receivedToken);

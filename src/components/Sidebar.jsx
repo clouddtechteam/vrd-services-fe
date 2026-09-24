@@ -113,8 +113,29 @@ export const Sidebar = () => {
             <User size={18} />
           </div>
           <div className="user-badge-meta">
-            <div className="user-badge-name">{user?.name || 'User'}</div>
-            <div className="user-badge-role">{user?.role === 'admin' ? 'Admin' : 'Client'}</div>
+            {/* User ID above Name */}
+            <div
+              className="user-badge-id"
+              style={{
+                fontSize: '0.72rem',
+                fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+                fontWeight: 700,
+                color: '#93c5fd',
+                letterSpacing: '0.04em',
+                lineHeight: 1.2,
+                marginBottom: '2px',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
+              }}
+              title={user?.userId || (isAdmin ? 'ADMIN' : '')}
+            >
+              {user?.userId || (isAdmin ? 'ADMIN' : (user?.id ? `ID: ${user.id.slice(-6).toUpperCase()}` : 'CLIENT'))}
+            </div>
+            <div className="user-badge-name" title={user?.name || 'User'}>
+              {user?.name || 'User'}
+            </div>
+            <div className="user-badge-role">{isAdmin ? 'Admin' : 'Client'}</div>
           </div>
         </div>
 

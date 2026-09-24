@@ -127,7 +127,7 @@ export const ClientsManagement = () => {
             <Search size={16} className="search-icon" />
             <input
               type="text"
-              placeholder="Filter this page..."
+              placeholder="Search by name, User ID, email..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="search-input"
@@ -153,6 +153,7 @@ export const ClientsManagement = () => {
             <thead>
               <tr>
                 <th style={{ width: '60px' }}>#</th>
+                <th>USER ID</th>
                 <th>NAME</th>
                 <th>EMAIL</th>
                 <th>ROLE</th>
@@ -168,6 +169,19 @@ export const ClientsManagement = () => {
                 return (
                   <tr key={client._id}>
                     <td data-label="#" style={{ color: '#64748b', fontWeight: 600 }}>{rowNum}</td>
+                    <td data-label="User ID">
+                      <span style={{
+                        fontFamily: 'monospace',
+                        fontWeight: 600,
+                        color: '#4338ca',
+                        background: '#eef2ff',
+                        padding: '3px 8px',
+                        borderRadius: '4px',
+                        fontSize: '0.82rem'
+                      }}>
+                        {client.userId || '—'}
+                      </span>
+                    </td>
                     <td data-label="Name">
                       <div className="user-cell">
                         <div className="avatar-circle" style={{ backgroundColor: avatarColor }}>
